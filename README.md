@@ -49,12 +49,14 @@ npm i -D svelte-flextable
         </tr>
     </thead>
     <tbody>
+    {#if $rows}
         {#each $rows as row}
             <tr>
                 <td>{row.first_name}</td>
                 <td>{row.last_name}</td>
             </tr>
         {/each}
+    {/if}
     </tbody>
 </table>
 ```
