@@ -5,7 +5,6 @@
 		"paths": {
 			"$components/*": ["./src/components/*"],
 			"$core/*": ["src/lib/core/*"],
-			"$utils/*": ["./src/utils/*"],
 			"$img/*": ["./src/assets/*"],
 			"$data/*": ["./src/data/*"],
 			"$lib":["src/lib"],

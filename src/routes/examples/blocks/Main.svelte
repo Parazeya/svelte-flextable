@@ -8,7 +8,7 @@
 	const handler = new DataHandler({
 		rowsPerPage: 20,
 		ajax: {
-			url: "/datatables/api/data",
+			url: "/api/data",
 			dataSrc: "result",
 		},
 	});

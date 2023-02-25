@@ -16,15 +16,6 @@ export default [
     },
     {
         name: 'api',
-        path: '/api',
-        anchors: [
-            { name: 'get rows', slug: '#get-rows' },
-            { name: 'sort', slug: '#sort' },
-            { name: 'search', slug: '#search' },
-            { name: 'rows per page', slug: '#rows-per-page' },
-            { name: 'row count', slug: '#row-count' },
-            { name: 'pagination', slug: '#pagination' },
-            { name: 'trigger change', slug: '#trigger-change' },
-        ],
+        path: '/api'
     }
 ]

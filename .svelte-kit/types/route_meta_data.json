@@ -1,13 +1,8 @@
 {
-	"/": [
-		"src/routes/+page.server.ts"
-	],
+	"/": [],
 	"/api": [],
 	"/api/data": [
 		"src/routes/api/data/+server.ts"
-	],
-	"/examples": [
-		"src/routes/examples/+page.server.ts"
 	],
 	"/examples/basic": [
 		"src/routes/examples/basic/+page.server.ts"

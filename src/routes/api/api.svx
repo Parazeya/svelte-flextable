@@ -1,11 +1,5 @@
-<script>
-    import Anchor from '$components/Anchor.svelte'
-</script>
-
 
 # DataHandler Methods
-
-<Anchor name="get-rows">
 
 ## Get rows
 
@@ -27,11 +21,9 @@
     {/each}
 </ul>
 ````
-</Anchor>
 
 
 
-<Anchor name="sort">
 
 ## Sort data
 
@@ -55,9 +47,7 @@
     Sort by email
 </button>
 ````
-</Anchor>
 
-<Anchor name="search">
 
 ## Search
 
@@ -80,10 +70,8 @@
     Clear
 </button>
 ````
-</Anchor>
 
 
-<Anchor name="rows-per-page">
 
 ## Rows per page
 
@@ -98,11 +86,9 @@
 
 <p>Show {$rowsPerPage} entries</p>
 ````
-</Anchor>
 
 
 
-<Anchor name="row-count">
 
 ## Row count
 
@@ -121,11 +107,9 @@
     of <b>{$rowCount.total}</b> entries
 </p>
 ````
-</Anchor>
 
 
 
-<Anchor name="pagination">
 
 ## Pagination
 
@@ -161,11 +145,9 @@
     Last page
 </button>
 ````
-</Anchor>
 
 
 
-<Anchor name="trigger-change">
 
 ## Trigger change
 
@@ -189,7 +171,6 @@
 
 </ul>
 ````
-</Anchor>
 
 
 

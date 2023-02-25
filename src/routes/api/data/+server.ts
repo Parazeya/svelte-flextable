@@ -3,9 +3,6 @@ import data from "$data/data"
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url }) {
-
-    console.log("GET", url.searchParams);
-
     const globalSearchData = url.searchParams.get("globalSearchData");
     const start = url.searchParams.get("start");
     const length = url.searchParams.get("length");
