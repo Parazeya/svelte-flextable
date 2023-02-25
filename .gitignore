@@ -1,10 +1,10 @@
 .DS_Store
 node_modules
 build/
-.svelte-kit/
+.svelte-kit
 .vs-code
-package/
-build/
+package
+build
 .env
 .env.*
 !.env.example
