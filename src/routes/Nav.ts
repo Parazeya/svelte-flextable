@@ -1,7 +1,7 @@
 export default [
     {
         name: 'home',
-        path: '/home',
+        path: '/',
     },
     {
         name: 'datatables',
