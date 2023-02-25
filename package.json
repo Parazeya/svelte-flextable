@@ -1,0 +1,48 @@
+{
+  "name": "svelte-flextable",
+  "version": "1.0.1",
+  "keywords": [
+    "svelte sveltejs sveltekit table tables datatable svelte-flextable"
+  ],
+  "description": "A toolkit for creating server-side processing datatable components with Svelte",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parazeya/svelte-flextable.git"
+  },
+  "author": "parazeya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/parazeya/svelte-flextable/issues"
+  },
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "package": "RD /Q /S \"./package\" && svelte-kit sync && svelte-package",
+    "prepublishOnly": "echo 'Did you mean to publish `./package/`, instead of `./`?' && exit 1",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "prettier --plugin-search-dir . --check . && eslint .",
+    "format": "prettier --plugin-search-dir . --write ."
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-vercel": "^2.1.1",
+    "@sveltejs/kit": "^1.0.0-next.589",
+    "@sveltejs/package": "next",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "eslint": "^8.16.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "mdsvex": "^0.10.6",
+    "prettier": "^2.6.2",
+    "prettier-plugin-svelte": "^2.7.0",
+    "prism-svelte": "^0.5.0",
+    "svelte": "^3.44.0",
+    "svelte-check": "^2.7.1",
+    "svelte-preprocess": "^4.10.6",
+    "tslib": "^2.3.1",
+    "typescript": "^4.7.4",
+    "vite": "^4.0.0"
+  },
+  "type": "module"
+}
