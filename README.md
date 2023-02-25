@@ -20,6 +20,7 @@ npm i -D svelte-flextable
 ## Client-side
 
 ```svelte
+//+page.svelte
 <script lang="ts">
     import { DataHandler } from "svelte-flextable";
     import { onMount } from "svelte";
@@ -39,7 +40,6 @@ npm i -D svelte-flextable
     });
 </script>
 
-//+page.svelte
 
 <table>
     <thead>
