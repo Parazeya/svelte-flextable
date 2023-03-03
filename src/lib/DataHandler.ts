@@ -27,11 +27,15 @@ export default class DataHandler {
         this.globalSearch = new GlobalSearch(this.context)
     }
 
-    renderData() {
+    public renderData() {
         return this.context.renderData();
     }
 
-    public setUrl(url: URL | string, trigger = true as boolean): void {
+    public getLoader() {
+        return this.context.isLoading;
+    }
+
+    public setURL(url: URL | string, trigger = true as boolean): void {
         this.context.ajax.url = url
         if (trigger) this.context.triggerMainChange.update(n => { return n + 1 })
     }

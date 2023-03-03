@@ -167,7 +167,15 @@ const handler = new DataHandler({
 # DataHandler methods
 
 ```typescript
-setURL( url: URL | string, trigger: boolean): void
+renderData(): promise
+```
+
+```typescript
+setURL( url: string, trigger: boolean): void
+```
+
+```typescript
+getLoader(): Readable<boolean>
 ```
 
 ```typescript

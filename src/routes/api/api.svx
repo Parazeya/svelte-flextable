@@ -1,6 +1,42 @@
 
 # DataHandler Methods
 
+## Render Data
+
+> **renderData()**: `Promise`
+
+````svelte
+<script lang="ts">
+    import { DataHandler } from 'svelte-flextable'
+    import { onMount } from "svelte";
+	
+    const url = "/api/data?id=1"
+    const handler = new DataHandler({ ajax: {url: url}, rowsPerPage: 50 })
+    
+    let rows;
+
+    onMount(() => {
+		handler.renderData().then(() => (rows = handler.getRows()));
+	});
+</script>
+````
+
+## Set URL
+
+> **setURL(** *url*: string, *trigger*: boolean **)**: `Void`
+
+````svelte
+<script lang="ts">
+    import { DataHandler } from 'svelte-flextable'
+
+    const url = "/api/data?id=1"
+    const newUrl = "/api/data?id=2"
+    const handler = new DataHandler({ ajax: {url: url}, rowsPerPage: 50 })
+    
+    handler.setURL(newUrl, false)
+</script>
+````
+
 ## Get rows
 
 > **getRows()**: `Readable<any[]>`
@@ -8,10 +44,9 @@
 ````svelte
 <script lang="ts">
     import { DataHandler } from 'svelte-flextable'
-    import { someData } from './my-data.json'
 
-    const handler = new DataHandler(someData, { rowsPerPage: 50 })
-
+    const url = "/api/data?id=1"
+    const handler = new DataHandler({ ajax: {url: url}, rowsPerPage: 50 })
     const rows = handler.getRows()
 </script>
 
