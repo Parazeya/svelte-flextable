@@ -76,6 +76,7 @@ export default class Context {
 		return derived([this.triggerMainChange], ([$triggerMainChange], set) => {
 			(async () => {
 				this.isLoading.set(true);
+				
 				const $pageNumber = getStoreData(this.pageNumber);
 				const $rowsPerPage = getStoreData(this.rowsPerPage);
 				const $sorted = getStoreData(this.sorted);
@@ -86,7 +87,7 @@ export default class Context {
 					length: Math.min($pageNumber * $rowsPerPage),
 				} as loadData;
 
-				if ($sorted) {
+				if ($sorted.identifier && $sorted.direction) {
 					options.sortBy = $sorted.identifier;
 					options.sortValue = $sorted.direction;
 				}
