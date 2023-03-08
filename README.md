@@ -15,6 +15,8 @@
 npm i -D svelte-flextable
 ```
 
+## 
+
 # Sample code
 
 ## Client-side
@@ -167,7 +169,18 @@ const handler = new DataHandler({
 # DataHandler methods
 
 ```typescript
-renderData(): promise
+downloadCSVFile(name, headers, data): Promise<void>
+downloadXLSXFile(name, headers, data): Promise<void>
+downloadJSONFile(name, data): Promise<void>
+```
+
+```typescript
+getFullList(): Promise<any[]>
+getCurrentList(): Promise<any[]>
+```
+
+```typescript
+renderData(): Promise<void>
 ```
 
 ```typescript
@@ -210,5 +223,3 @@ setPage( value: number | ‘previous’ | ‘next’ ): void
 ```typescript
 getTriggerChange(): Writable<number>
 ```
-
-## Big thanks @vincjo for Datatables repo! <3

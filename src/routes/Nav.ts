@@ -12,6 +12,7 @@ export default [
             { name: 'small', path: '/small' },
             { name: 'i18n', path: '/i18n' },
             { name: 'blocks', path: '/blocks' },
+            { name: 'exports', path: '/exports' },
         ],
     },
     {

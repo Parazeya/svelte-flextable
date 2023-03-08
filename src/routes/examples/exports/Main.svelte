@@ -1,8 +1,9 @@
 <script lang="ts">
+	import type { Readable } from "svelte/store";
 	import { DataHandler, Datatable, Th } from "$lib/core";
 	import { onMount } from "svelte";
 
-	let rows;
+	let rows: Readable<any>;
 
 	const handler = new DataHandler({
 		rowsPerPage: 20,
@@ -12,8 +13,8 @@
 		},
 	});
 
-	let exportHeaders = ["ID", "First Name", "Last Name", "Email"];
-	let exportFileName = "Svelte-flextable";
+	let exportHeaders = ["ID", "First Name", "Last Name", "Email"]
+	let exportFileName = "Svelte-flextable"
 
 	onMount(() => {
 		handler.renderData().then(() => (rows = handler.getRows()));

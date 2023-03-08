@@ -11,6 +11,7 @@ type loadData = {
 	globalSearchData?: string;
 	sortBy?: string;
 	sortValue?: string;
+	export?: string;
 };
 
 export default class Context {
@@ -52,6 +53,41 @@ export default class Context {
 		return Promise.all([(this.rows = this.createTriggerUpdate())]);
 	}
 
+	public async getFullDataToExport() {
+		this.isLoading.set(true);
+		const data = await this.loadData({export: "all"});
+		this.isLoading.set(false);
+		return data;
+	}
+
+	public async getCurrentDataToExport() {
+		this.isLoading.set(true);
+		
+		const $pageNumber = getStoreData(this.pageNumber);
+		const $rowsPerPage = getStoreData(this.rowsPerPage);
+		const $sorted = getStoreData(this.sorted);
+		const $globalSearch = getStoreData(this.globalSearch);
+
+		const options = {
+			start: $pageNumber * $rowsPerPage - $rowsPerPage + 1,
+			length: Math.min($pageNumber * $rowsPerPage),
+			export: "current"
+		} as loadData;
+
+		if ($sorted.identifier && $sorted.direction) {
+			options.sortBy = $sorted.identifier;
+			options.sortValue = $sorted.direction;
+		}
+
+		if ($globalSearch.value) options.globalSearchData = $globalSearch.value;
+
+		this.isLoading.set(false);
+
+		const data = await this.loadData(options);
+
+		return data;
+	}
+
 	private async loadData(options?: loadData) {
 		let query: any, result: any, url: any, querystring;
 
@@ -76,7 +112,7 @@ export default class Context {
 		return derived([this.triggerMainChange], ([$triggerMainChange], set) => {
 			(async () => {
 				this.isLoading.set(true);
-				
+
 				const $pageNumber = getStoreData(this.pageNumber);
 				const $rowsPerPage = getStoreData(this.rowsPerPage);
 				const $sorted = getStoreData(this.sorted);
