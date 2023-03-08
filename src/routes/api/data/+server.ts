@@ -13,7 +13,7 @@ export async function GET({ url }) {
     let lengthData = 0;
 
     if (globalSearchData) {
-        resultData = data.filter(e => e.first_name.toLocaleLowerCase().includes(globalSearchData) || e.last_name.toLocaleLowerCase().includes(globalSearchData) || e.email.toLocaleLowerCase().includes(globalSearchData))
+        resultData = data.filter(e => e.first_name.toLocaleLowerCase().includes(globalSearchData.toLocaleLowerCase()) || e.last_name.toLocaleLowerCase().includes(globalSearchData.toLocaleLowerCase()) || e.email.toLocaleLowerCase().includes(globalSearchData.toLocaleLowerCase()))
         lengthData = resultData.length
     }
 

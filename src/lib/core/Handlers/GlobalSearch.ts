@@ -13,7 +13,7 @@ export default class Search {
     public set(value: string, scope: string[] = null): void {
         this.globalSearch.update(store => {
             store = {
-                value: value.toLocaleLowerCase() ?? '',
+                value: value ?? '',
                 scope: scope ?? null
             }
             return store
