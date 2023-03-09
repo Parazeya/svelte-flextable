@@ -1,6 +1,6 @@
 {
   "name": "svelte-flextable",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "keywords": [
     "svelte sveltejs sveltekit table tables datatable svelte-flextable"
   ],
@@ -33,7 +33,6 @@
     "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-svelte3": "^4.0.0",
-    "file-saver": "^2.0.5",
     "mdsvex": "^0.10.6",
     "prettier": "^2.6.2",
     "prettier-plugin-svelte": "^2.7.0",
@@ -43,8 +42,11 @@
     "svelte-preprocess": "^4.10.6",
     "tslib": "^2.3.1",
     "typescript": "^4.7.4",
-    "vite": "^4.0.0",
-    "xlsx": "^0.18.5"
+    "vite": "^4.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "file-saver": "^2.0.5",
+    "xlsx": "^0.18.5"
+  }
 }
