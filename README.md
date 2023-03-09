@@ -19,6 +19,10 @@ Instead of rendering all your data, svelte-flextable renders only pages with fil
 npm i -D svelte-flextable
 ```
 
+# In developing
+- Cursor pagination support
+- SQL Examples
+
 # Sample code
 
 ## Client-side
