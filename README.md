@@ -9,13 +9,15 @@
 
 <br>
 
+# About
+
+Instead of rendering all your data, svelte-flextable renders only pages with filters (rows-per-page, search, pagination). Thanks to this, you reduce the load on your server.
+
 # Install
 
 ```apache
 npm i -D svelte-flextable
 ```
-
-## 
 
 # Sample code
 
@@ -63,7 +65,7 @@ npm i -D svelte-flextable
 </table>
 ```
 
-## Server-side
+# Server-side
 
 ```javascript
 //+server.js|ts
