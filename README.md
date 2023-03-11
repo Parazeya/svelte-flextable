@@ -20,6 +20,7 @@ npm i -D svelte-flextable
 ```
 
 # Futures
+
 - Cursor pagination support
 - SQL Examples
 
@@ -229,3 +230,7 @@ setPage( value: number | ‘previous’ | ‘next’ ): void
 ```typescript
 getTriggerChange(): Writable<number>
 ```
+
+# Credit
+
+This project was created based on the [@vincjo/datatables](https://github.com/vincjo/datatables) <3 repository
