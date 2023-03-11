@@ -231,6 +231,6 @@ setPage( value: number | ‘previous’ | ‘next’ ): void
 getTriggerChange(): Writable<number>
 ```
 
-# Credit
+# Credits
 
 This project was created based on the [@vincjo/datatables](https://github.com/vincjo/datatables) <3 repository
