@@ -2,21 +2,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { writable, derived, readable, get as getStoreData } from "svelte/store";
+
 import type { Writable, Readable } from "svelte/store";
-import type { Params, Ajax } from "../DataHandler";
-
-type loadData = {
-	start?: number;
-	length?: number;
-	globalSearchData?: string;
-	sortBy?: string;
-	sortValue?: string;
-	export?: string;
-};
-
+import type { Params, Ajax, dataFetcher, Pagination } from "../DataHandler";
 export default class Context {
 	public isLoading: Writable<boolean>;
 	public ajax: Ajax;
+	public pagination: Pagination;
 	public ajaxRecordsTotal: Writable<number | null>;
 	public ajaxRecordsFiltered: Writable<number | null>;
 	public rowsPerPage: Writable<number | null>;
@@ -30,66 +22,49 @@ export default class Context {
 	public pagesWithEllipsis: Readable<number[]>;
 	public pageCount: Readable<number>;
 	public sorted: Writable<{ identifier: string | null; direction: "asc" | "desc" | null }>;
+	public handler: Function;
+	public nextCursor: Writable<string | number | null>;
+	public prevCursor: Writable<string | number | null>;
+	public triggeredPaginate: Writable<string | null>;
+
 
 	constructor(params: Params) {
 		this.isLoading = writable(false);
-		this.rowsPerPage = writable(params.rowsPerPage);
-		this.pageNumber = writable(1);
-		this.triggerChange = writable(0);
-		this.triggerMainChange = writable(0);
-		this.globalSearch = writable({ value: null, scope: null });
+		this.pagination = params.pagination
 		this.ajax = params.ajax;
-		this.ajaxRecordsFiltered = writable(0);
-		this.ajaxRecordsTotal = writable(0);
+		this.rowsPerPage = writable(params.rowsPerPage);
+		this.handler = params.ajax.handler
+		this.triggerMainChange = writable(0);
+		this.triggerChange = writable(0);
+		this.globalSearch = writable({ value: null, scope: null });
 		this.rows = readable([]);
-		this.rowCount = this.createRowCount();
-		this.pages = this.createPages();
-		this.pagesWithEllipsis = this.createPagesWithEllipsis();
-		this.pageCount = this.createPageCount();
+
+		if (params.ajax.handler == null) this.handler = this.dataFetcher;
+		else this.handler = params.ajax.handler;
+
+
+		if (this.pagination.type == "cursor") {
+			this.nextCursor = writable(null);
+			this.prevCursor = writable(null);
+			this.triggeredPaginate = writable(null);
+		} else {
+			this.pageNumber = writable(1);
+			this.ajaxRecordsFiltered = writable(0);
+			this.ajaxRecordsTotal = writable(0);
+			this.rowCount = this.createRowCount();
+			this.pages = this.createPages();
+			this.pageCount = this.createPageCount();
+			this.pagesWithEllipsis = this.createPagesWithEllipsis();
+		}
+
 		this.sorted = writable({ identifier: null, direction: null });
 	}
 
 	public renderData() {
 		return Promise.all([(this.rows = this.createTriggerUpdate())]);
 	}
-
-	public async getFullDataToExport() {
-		this.isLoading.set(true);
-		const data = await this.loadData({export: "all"});
-		this.isLoading.set(false);
-		return data;
-	}
-
-	public async getCurrentDataToExport() {
-		this.isLoading.set(true);
-		
-		const $pageNumber = getStoreData(this.pageNumber);
-		const $rowsPerPage = getStoreData(this.rowsPerPage);
-		const $sorted = getStoreData(this.sorted);
-		const $globalSearch = getStoreData(this.globalSearch);
-
-		const options = {
-			start: $pageNumber * $rowsPerPage - $rowsPerPage + 1,
-			length: Math.min($pageNumber * $rowsPerPage),
-			export: "current"
-		} as loadData;
-
-		if ($sorted.identifier && $sorted.direction) {
-			options.sortBy = $sorted.identifier;
-			options.sortValue = $sorted.direction;
-		}
-
-		if ($globalSearch.value) options.globalSearchData = $globalSearch.value;
-
-		this.isLoading.set(false);
-
-		const data = await this.loadData(options);
-
-		return data;
-	}
-
-	private async loadData(options?: loadData) {
-		let query: any, result: any, url: any, querystring;
+	private async dataFetcher(options: dataFetcher) {
+		let query: any, result: any, url: any, querystring: any;
 
 		try {
 			querystring = Object.entries(options)
@@ -98,14 +73,32 @@ export default class Context {
 			this.ajax.url.includes("?") ? (url = this.ajax.url + "&" + querystring) : (url = this.ajax.url + "?" + querystring);
 
 			query = await fetch(url);
-			if (!query) throw new Error("Could not load data");
+			if (!query.ok) throw new Error("Could not load data");
 			result = await query.json();
 		} catch (error) {
 			console.log(error);
-			result = [];
+			result = null;
 		}
 		return result;
 	}
+	// private async loadData(options?: loadData) {
+	// 	let query: any, result: any, url: any, querystring;
+
+	// 	try {
+	// 		querystring = Object.entries(options)
+	// 			.map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+	// 			.join("&");
+	// 		this.ajax.url.includes("?") ? (url = this.ajax.url + "&" + querystring) : (url = this.ajax.url + "?" + querystring);
+
+	// 		query = await fetch(url);
+	// 		if (!query) throw new Error("Could not load data");
+	// 		result = await query.json();
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		result = [];
+	// 	}
+	// 	return result;
+	// }
 
 	private createTriggerUpdate(): Readable<any[]> {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -113,15 +106,13 @@ export default class Context {
 			(async () => {
 				this.isLoading.set(true);
 
-				const $pageNumber = getStoreData(this.pageNumber);
-				const $rowsPerPage = getStoreData(this.rowsPerPage);
 				const $sorted = getStoreData(this.sorted);
 				const $globalSearch = getStoreData(this.globalSearch);
+				const $rowsPerPage = getStoreData(this.rowsPerPage);
 
 				const options = {
-					start: $pageNumber * $rowsPerPage - $rowsPerPage + 1,
-					length: Math.min($pageNumber * $rowsPerPage),
-				} as loadData;
+					limit: $rowsPerPage,
+				} as dataFetcher;
 
 				if ($sorted.identifier && $sorted.direction) {
 					options.sortBy = $sorted.identifier;
@@ -130,12 +121,44 @@ export default class Context {
 
 				if ($globalSearch.value) options.globalSearchData = $globalSearch.value;
 
-				const tableData = await this.loadData(options);
+				if (this.pagination.type == "cursor") {
+					const $nextCursor = getStoreData(this.nextCursor);
+					const $prevCursor = getStoreData(this.prevCursor);
+					const $triggeredPaginate = getStoreData(this.triggeredPaginate);
 
-				this.ajaxRecordsFiltered.set(tableData.recordsFiltered);
-				this.ajaxRecordsTotal.set(tableData.recordsTotal);
+					if ($triggeredPaginate) {
+						options.cursorDirection = $triggeredPaginate
+						options.cursor = $triggeredPaginate == "after" ? $nextCursor : $prevCursor;
+						this.nextCursor.set(null);
+						this.prevCursor.set(null);
+						this.triggeredPaginate.set(null);
+					}
 
-				set(this.ajax.dataSrc ? tableData[this.ajax.dataSrc] : tableData.data);
+					const tableData = await this.handler(options)
+					console.log(tableData.meta)
+
+					if (!tableData) return set([]);
+
+					this.nextCursor.set(tableData.meta.nextCursor);
+					this.prevCursor.set(tableData.meta.prevCursor);
+					set(tableData[this.ajax.dataSrc])
+				} else if (this.pagination.type == "offset") {
+					const $pageNumber = getStoreData(this.pageNumber);
+
+					options.start = $pageNumber * $rowsPerPage - $rowsPerPage + 1
+					options.length = Math.min($pageNumber * $rowsPerPage)
+
+					const tableData = await this.handler(options);
+					if (!tableData) {
+						this.ajaxRecordsFiltered.set(0)
+						this.ajaxRecordsTotal.set(0)
+						set([])
+						return;
+					}
+					this.ajaxRecordsFiltered.set(tableData.recordsFiltered);
+					this.ajaxRecordsTotal.set(tableData.recordsTotal);
+					set(tableData[this.ajax.dataSrc]);
+				}
 				this.isLoading.set(false);
 			})();
 			set([]);
@@ -209,5 +232,19 @@ export default class Context {
 			});
 		}
 		return String(entry).indexOf(String(value)) > -1;
+	}
+
+	public async getFullDataToExport() {
+		this.isLoading.set(true);
+		const data = await this.dataFetcher({ export: "all" });
+		this.isLoading.set(false);
+		return data;
+	}
+
+	public async getCurrentDataToExport() {
+		const data = getStoreData(this.rows)
+		const result = {}
+		result[this.ajax.dataSrc] = data
+		return result;
 	}
 }

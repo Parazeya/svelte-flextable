@@ -1,6 +1,6 @@
-import type { Ajax } from '../../DataHandler';
 import type Context from '../Context'
 import type { Writable, Readable } from 'svelte/store'
+import { get as getStoreData } from 'svelte/store';
 
 export default class Pages {
     public pageNumber: Writable<number>
@@ -8,13 +8,21 @@ export default class Pages {
     public rowsPerPage: Writable<number | null>
     public triggerChange: Writable<number>
     public pages: Readable<any[]>
+    public paginationType: string;
+    public triggeredPaginate: Writable<string>;
 
     constructor(context: Context) {
-        this.pageNumber = context.pageNumber
-        this.rowCount = context.rowCount
+        this.paginationType = context.pagination.type
+        if (this.paginationType === 'cursor') {
+            this.triggeredPaginate = context.triggeredPaginate
+        } else {
+            this.pageNumber = context.pageNumber
+            this.rowCount = context.rowCount
+            this.pages = context.pages
+        }
         this.rowsPerPage = context.rowsPerPage
         this.triggerChange = context.triggerChange
-        this.pages = context.pages
+
     }
 
     public get(): Readable<any[]> {
@@ -36,30 +44,34 @@ export default class Pages {
     }
 
     public previous(): void {
-        const number = this.getPageNumber() - 1
-        this.goTo(number)
+        if (this.paginationType === 'cursor') {
+            this.triggeredPaginate.set("before")
+            this.triggerChange.update(store => { return store + 1 })
+        } else {
+            const number = this.getPageNumber() - 1
+            this.goTo(number)
+        }
     }
 
     public next(): void {
-        const number = this.getPageNumber() + 1
-        this.goTo(number)
+        if (this.paginationType === 'cursor') {
+            this.triggeredPaginate.set("after")
+            this.triggerChange.update(store => { return store + 1 })
+        } else {
+            const number = this.getPageNumber() + 1
+            this.goTo(number)
+        }
     }
 
     private getPageNumber(): number {
-        let value = 1
-        this.pageNumber.subscribe(store => value = store)
-        return value
+        return getStoreData(this.pageNumber)
     }
 
     private getTotalRowCount(): number {
-        let value = 0
-        this.rowCount.subscribe(store => value = store.total)
-        return value
+        return getStoreData(this.rowCount).total
     }
 
     private getRowsPerPage(): number | null {
-        let value = null
-        this.rowsPerPage.subscribe(store => value = store)
-        return value
+        return getStoreData(this.rowsPerPage)
     }
 }

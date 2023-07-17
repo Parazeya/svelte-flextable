@@ -5,13 +5,11 @@ export default class Rows {
     private triggerChange: Writable<number>
     private triggerMainChange: Writable<number>
     private sorted: Writable<{ identifier: string | null; direction: 'asc' | 'desc' | null; }>
-    private pageNumber: Writable<number>;
 
     constructor(context: Context) {
         this.triggerChange = context.triggerChange
         this.triggerMainChange = context.triggerMainChange
         this.sorted = context.sorted
-        this.pageNumber = context.pageNumber
     }
 
     public sort(orderBy: Function | string): void {

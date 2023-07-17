@@ -7,9 +7,12 @@
 	const handler = new DataHandler({
 		rowsPerPage: 20,
 		ajax: {
-			url: "/api/data",
+			url: "/api/cursordata",
 			dataSrc: "result",
 		},
+		pagination: {
+			type: "cursor"
+		}
 	});
 
 	let exportHeaders = ["ID", "First Name", "Last Name", "Email"];

@@ -10,9 +10,20 @@ import { saveAs } from "file-saver";
 
 import type { Readable, Writable } from "svelte/store";
 import type { Internationalization } from "$lib";
+export type dataFetcher = {
+	start?: number;
+	length?: number;
+	globalSearchData?: string;
+	sortBy?: string;
+	sortValue?: string;
+	export?: string;
+	cursor?: string | number;
+	cursorDirection?: string;
+};
 
-export type Ajax = { url: any; dataSrc?: string };
-export type Params = { rowsPerPage?: number; i18n?: Internationalization; ajax?: Ajax };
+export type Ajax = { url: any; dataSrc?: string, handler?: Function };
+export type Pagination = { type: "offset" | "cursor" };
+export type Params = { rowsPerPage?: number; i18n?: Internationalization; ajax: Ajax, pagination?: Pagination };
 
 export default class DataHandler {
 	private context: Context;
@@ -21,7 +32,8 @@ export default class DataHandler {
 	private globalSearch: GlobalSearch;
 	public i18n: Internationalization;
 
-	constructor(params: Params = { rowsPerPage: null, ajax: null }) {
+	constructor(params: Params = { rowsPerPage: 20, pagination: { type: "offset" }, ajax: { dataSrc: "data", url: null, handler: null } }) {
+		if (!params.pagination) params.pagination = { type: "offset" };
 		this.i18n = this.translate(params.i18n);
 		this.context = new Context(params);
 		this.rows = new Rows(this.context);
@@ -39,6 +51,10 @@ export default class DataHandler {
 
 	public async getCurrentList() {
 		return this.context.getCurrentDataToExport();
+	}
+
+	public getPaginationType() {
+		return this.context.pagination.type;
 	}
 
 	public getLoader() {
@@ -66,7 +82,9 @@ export default class DataHandler {
 	}
 
 	public sort(orderBy: Function | string): void {
-		this.setPage(1, false);
+		if (this.context.pagination.type === "offset") {
+			this.setPage(1, false);
+		}
 		this.rows.sort(orderBy);
 	}
 
@@ -97,7 +115,15 @@ export default class DataHandler {
 		return this.context.pageNumber;
 	}
 
-	public setPage(value: number | "previous" | "next", trigger = true): void {
+	public getNextCursor(): Readable<string | number> {
+		return this.context.nextCursor;
+	}
+
+	public getPrevCursor(): Readable<string | number> {
+		return this.context.prevCursor;
+	}
+
+	public setPage(value: number | "previous" | "next" | "before" | "after", trigger = true): void {
 		switch (value) {
 			case "previous":
 				this.pages.previous();
@@ -107,6 +133,20 @@ export default class DataHandler {
 					});
 				break;
 			case "next":
+				this.pages.next();
+				if (trigger)
+					this.context.triggerMainChange.update((n) => {
+						return n + 1;
+					});
+				break;
+			case "before":
+				this.pages.previous();
+				if (trigger)
+					this.context.triggerMainChange.update((n) => {
+						return n + 1;
+					});
+				break;
+			case "after":
 				this.pages.next();
 				if (trigger)
 					this.context.triggerMainChange.update((n) => {
@@ -143,7 +183,7 @@ export default class DataHandler {
 	}
 
 	public downloadCSVFile(name: string, header: string[][], data: any, compression = true as boolean) {
-		const worksheet = utils.json_to_sheet(this.context.ajax.dataSrc ? data[this.context.ajax.dataSrc] : data.data);
+		const worksheet = utils.json_to_sheet(data[this.context.ajax.dataSrc]);
 		const workbook = utils.book_new();
 
 		utils.book_append_sheet(workbook, worksheet, name);
@@ -156,7 +196,7 @@ export default class DataHandler {
 	}
 
 	public downloadXLSXFile(name: string, header: string[][], data: any, compression = true as boolean) {
-		const worksheet = utils.json_to_sheet(this.context.ajax.dataSrc ? data[this.context.ajax.dataSrc] : data.data);
+		const worksheet = utils.json_to_sheet(data[this.context.ajax.dataSrc]);
 		const workbook = utils.book_new();
 
 		utils.book_append_sheet(workbook, worksheet, name);
@@ -169,7 +209,7 @@ export default class DataHandler {
 	}
 
 	public downloadJSONFile(name: string, data: any, type = "text/plain;charset=utf-8") {
-		const blob = new Blob([JSON.stringify(this.context.ajax.dataSrc ? data[this.context.ajax.dataSrc] : data.data)], { type });
+		const blob = new Blob([JSON.stringify(data[this.context.ajax.dataSrc])], { type });
 		saveAs(blob, name + ".json");
 	}
 }

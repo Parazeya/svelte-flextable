@@ -4,17 +4,18 @@ import data from "$data/data"
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url }) {
     const globalSearchData = url.searchParams.get("globalSearchData");
-    const start = url.searchParams.get("start") ? parseInt(url.searchParams.get("start")) : 0;
-    const length = url.searchParams.get("length") ? parseInt(url.searchParams.get("length")) : 0;
+    const limit = parseInt(url.searchParams.get("limit"));
     const sortBy = url.searchParams.get("sortBy");
     const sortValue = url.searchParams.get("sortValue");
+    const cursor = url.searchParams.get("cursor");
+    const cursorDirection = url.searchParams.get("cursorDirection");
 
     let resultData = [...data];
-    let lengthData = 0;
+    // let lengthData = 0;
 
     if (globalSearchData) {
         resultData = data.filter(e => e.first_name.toLocaleLowerCase().includes(globalSearchData.toLocaleLowerCase()) || e.last_name.toLocaleLowerCase().includes(globalSearchData.toLocaleLowerCase()) || e.email.toLocaleLowerCase().includes(globalSearchData.toLocaleLowerCase()))
-        lengthData = resultData.length
+        // lengthData = resultData.length
     }
 
     if (sortBy && sortValue) {
@@ -53,15 +54,23 @@ export async function GET({ url }) {
 
     }
 
-    if (start && length) {
-        resultData = resultData.slice(start - 1, length)
-    }
+    const filteredData = (cursorDirection && cursor != 'null') ? resultData.filter(v => {
+        if (cursorDirection == "before") {
+            return v.id < parseInt(cursor)
+        } else if (cursorDirection == "after") {
+            return v.id > parseInt(cursor)
+        }
+    }).slice(0, limit + 1) : resultData.slice(0, limit + 1)
 
+    const nextCursor = (filteredData.length > limit) ? filteredData[filteredData.length - 2].id : null
+    const prevCursor = (cursorDirection && cursor != 'null') ? filteredData[0].id == 1 ? null : filteredData[0].id : null
 
     return json({
         type: "success",
-        result: resultData,
-        recordsTotal: data.length,
-        recordsFiltered: globalSearchData ? lengthData : data.length
+        result: filteredData.slice(0, limit),
+        meta: {
+            nextCursor,
+            prevCursor
+        }
     })
 }

@@ -46,7 +46,7 @@
 	</article>
 
 	<footer class:container={rowCount || pagination}>
-		{#if rowCount}
+		{#if rowCount && handler.getPaginationType() == "offset"}
 			<RowCount {handler} small={clientWidth < 600} />
 		{/if}
 		{#if pagination}

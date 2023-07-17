@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { DataHandler } from '$lib/core';
+  import type { DataHandler } from "$lib/core";
   export let handler: DataHandler;
-  let value = '';
+  let value = "";
 </script>
 
 <input
@@ -9,7 +9,9 @@
   placeholder={handler.i18n.search}
   spellcheck="false"
   on:input={() => {
-    handler.setPage(1, false);
+    if (handler.getPaginationType() === "offset") {
+      handler.setPage(1, false);
+    }
     handler.search(value);
   }}
 />
